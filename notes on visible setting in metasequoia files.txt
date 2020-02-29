@@ -1,0 +1,32 @@
+in Object {}
+at:
+
+visible 0
+everything vanishes
+
+visible 1
+only the vertices are visible
+
+visible 2
+the lines connecting the vertices are visible but not the vertices or the faces
+
+visible 3
+the vertices and lines connecting them are visible but not the faces
+
+visible 4
+only the faces are visible, not the vertices or lines connecting them
+
+visible 5
+only the vertices and the faces are visible
+
+visible 6
+the faces and the lines connecting the vertices are visible but not the vertices
+
+visible 7
+the vertices, faces, and lines connecting the vertices are visible
+
+visible 10
+the vertices, faces, and lines connecting the vertices are visible
+
+visible 15
+the normal setting - everything is visible

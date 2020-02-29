@@ -1,0 +1,148 @@
+
+==============================
+Metasequoia file format:
+
+Metasequoia files are ANSI text files containing information about a 3D model.
+The file is laid out in parts / sections.
+All parts/sections (except the Header) begin with a token and are followed by an opening curly bracket.
+A closing curly bracket ends a section (except for "object", in which case the bracket ends only one objects's definition).
+
+Do note that the information presented here is how the program Metasequoia SE treats the file.
+Such treatment may not apply in other programs that open Metasequoia files and display their models.
+
+
+
+Part 1: Header:
+"Metasequoia Document
+Format Text Ver 1.0"
+
+Part 2: "Scene" :
+This section begins with the token "Scene".
+Within this are (including tabbing) the following lines:
+"
+	pos
+	lookat
+	head
+	pich
+	ortho
+	zoom2
+	amb
+"
+The last part of this group is a closing bracket "}".
+All of these lines can be ignored when converting to object (.obj)
+since they only deal with how Metasequoia should display the model.
+They can also be ignored when converting back, since Metasequoia has defaults for these.
+
+
+Part 3: "Material"/skin/texture
+This section begins with the token "Material" followed by an integer.
+The integer gives the total number of materials there are.
+The integer is followed by a bracket, and on each successive line between them is texture info.
+This information is given in commands, seperated by spaces:
+>> "texture_name" - The texture name given in parenthesis
+>> "col" - the color - followed immediately by parenthesis containing four float numbers.
+These numbers are argb values, but are all set to one if an outside texture is applied to the model.
+>> "dif" - how diffuse the colors are.
+Following this immediately in parenthesis is a floating point value for the diffuse value.
+This number ranges from 0 to 1. Default is 0.800 .
+Diffuse scatters the external light over the surface.
+It makes it seem like the light source is either a flashlight or the sun.
+>> "amb" - the ambient. Same format as "dif", default value of 0.600 . Ranges from 0 to 1.
+The ambient scatters light over the surface, otherwise the object color appears abit less lit and more uniform.
+>> "emi" - the emission. Same format as "dif", default value of 0.000 . Ranges from 0 to 1.
+The emission makes the object's color radiate, so as to glow without giving off light (decrease shadow effect).
+>> "spc" - the specular. Same format as "dif", default value of 0. Ranges from 0 to 1.
+The specular provides reflection of other light sources.
+>> "power" - the power. Same format as "diff", default value of 5. Ranges from 0 to 100.
+Power is the force of the color against the dominance of the light source's color on its surface.
+>> optionally: "tex" - the texture/material/skin applied to the object. This can be added on.
+"tex" is followed immediately by parenthesis that contain, in quotation marks, the name of a texture file.
+For Metasequoia, these files can range from bitmap to jpeg to png.
+
+
+IMPORTANT NOTE: Metaseqouia only supports one color for a material.
+The ambient, diffuse, etc. are all shades of that color, with percent lightness determined by each one's value.
+
+
+Part 4: "Object" / objects within the scene
+This section begins with the token "Object".
+Metasequoia allows for several sub-objects with a scene to allow for easy working.
+Multiple of these "objects" can be in a single metasequoia file.
+Though object files (.obj) support separate objects, grouping is unnecessary.
+
+The word starting each Metasequoia object is "Object".
+The first word after "Object" is the name of the metasequoia object, or "group".
+This is only important for Metasequoia objects.
+There must be at least one of these groups in a Metasequoia file to hold the model info.
+
+Within a group are the following:
+"
+	visible
+	locking
+	shading
+	facet
+	color
+	color_type
+	vertex
+	face
+"
+Each is followed immediately by a single number (unless otherwise specified)
+
+"visible" is followed by a single visibility parameter, usually 15 (zero means invisible).
+
+"locking" is only for metasequoia editing: indicating whether the object is editable.
+Its default value is 0 (unlocked). (1=locked)
+
+"shading" is unknown. Default value is 1.
+
+"facet" appears to be a facet generation: how many faces a face appears to have from light.
+Default is 59.5 , which does nothing special.
+
+"color" is for the rgb color value of the vertices and connecting lines.
+It is immediately followed by three floating point numbers single spaced apart.
+The values range from 0.0 to 1.0 .
+
+"color_type" determines whether the color for the vertices and lines is active.
+1 or greater indicates that it is, otherwise the lines and vertices remain white.
+
+"vertex" holds the vertices for the group.
+It is followed by a single integer number indicating the total number of vertices.
+The number is followed by an opening curly bracket.
+Each successive line after the bracket line holds three floating point numbers.
+Each set of floating point numbers give the location of that specific vertex.
+The group is closed by a single curly bracket.
+
+"face" holds the faces for the group.
+It is followed by a single integre number indicating the total number of faces.
+The number is followed by an opening bracket.
+Each successive line after the bracket gives information about the face.
+Each line is several parts, separated only by a single space:
+>> A number indicating how many vertices form the face.
+>> A capital v (V), which is immediately followed by parenthesis.
+Within the parenthesis and separated by spaces are the specific vertices forming that face.
+Their number is the line that they came on after the bracket in the "vertex" bracket group.
+(Note that Metasequoia files start there vertices with index of 0 vs .obj having an index of 1.)
+Vertices for forming faces are given in clockwise order.
+(That is, if the face were a clock, a hand spinning clockwise would mark each successive vertex.)
+>> optionally: a capital m (M), immediately followed by parenthesis containing a single integer.
+The integer gives the line after the bracket after "Material", indicating the material to apply to the face.
+>> optionally: a capital uv (UV), immediately followed by parenthesis.
+Within the parenthesis are a pair of floating point numbers for every vertex in the face.
+
+
+Optionally between "color_type" and "vertex" are the keywords "mirror" and "mirror_axis".
+Both must come together.
+"mirror" is followed by a single integer indicating the setting: 1 for separated objects, 2 for joined.
+"mirror_axis" indicates which axis or multiple axis the object is to be mirrored about.
+>> 1 for x alone
+>> 2 for y alone
+>> 3 for y and x
+>> 4 for z alone
+>> 5 for z and x
+>> 6 for z and y
+>> 7 for x, y, and z axis
+
+
+
+At the end of the file is the line "Eof".
+This is important when converting back to Metasequoia files (.mqo).
